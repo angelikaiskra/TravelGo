@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">TravelGo</string>
     <string name="access_token">pk.eyJ1IjoiYW5nZWxhNTg4IiwiYSI6ImNqbjFnNDBoYzRqeXkzdm9lZjg2M29ob20ifQ.by2el7eSQhgEt8i5JUIdXg</string>
+    <string name="user_location_permission_explanation">We need permission to access your location in order to app working correctly</string>
+    <string name="user_location_permission_not_granted">Permission not granted! Application can crash</string>
 </resources>
