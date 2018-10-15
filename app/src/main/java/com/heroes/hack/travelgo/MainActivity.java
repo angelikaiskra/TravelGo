@@ -1,5 +1,6 @@
 package com.heroes.hack.travelgo;
 
+import android.app.ActionBar;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
@@ -7,10 +8,18 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+//import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
+import android.content.Intent;
+import android.view.View;
+import android.support.v7.widget.Toolbar;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -31,6 +40,7 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
+import com.heroes.hack.travelgo.ProfileActivity;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -50,9 +60,17 @@ public class MainActivity extends AppCompatActivity implements
 
     private MarkerManager markerManager;
 
+    private DrawerLayout mDrawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+//        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         markerManager = new MarkerManager();
 
@@ -62,6 +80,29 @@ public class MainActivity extends AppCompatActivity implements
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull  MenuItem menuItem) {
+                        menuItem.setChecked(true);
+
+                        Log.d("MainActivity", (String) menuItem.getTitle());
+                        String buttonTitle = (String)menuItem.getTitle();
+
+                        if (buttonTitle.equals("My account")) {
+                            openUserProfile();
+                            Log.d( "MainActivity", "My profile Clicked");
+                        }
+                        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+
+                        return true;
+                    }
+                }
+        );
     }
 
     @Override
@@ -210,5 +251,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<List<Relic>> loader) {
         markerManager.clear();
+    }
+
+    public void openUserProfile() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
     }
 }
