@@ -19,27 +19,28 @@ import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 
-import java.security.Permission;
-import java.util.ArrayList;
 import java.util.List;
+
+import timber.log.Timber;
 
 
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener, LocationEngineListener,
-        LoaderManager.LoaderCallbacks<List<Relic>> {
+        LoaderManager.LoaderCallbacks<List<Relic>>, MapboxMap.OnMarkerClickListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final int RELICS_LOADER_ID = 1;
-    public static final String requestUrl = "http://192.168.1.8:8080/relics/53.46293098/14.54855329/1200";
+    private static final int DIFFERENCE_DISTANCE_IN_METERS = 500; // load more markers after 1km
+    public String requestUrl;
 
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements
     private LocationEngine locationEngine;
     private Location originLocation;
     private MapView mapView;
+    private Location helperLocation;
+    private Location userLocation;
 
     private MarkerManager markerManager;
 
@@ -54,7 +57,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        markerManager = new MarkerManager();
+        requestUrl = getResources().getString(R.string.request_url);
+        markerManager = new MarkerManager(IconFactory.getInstance(this));
 
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.activity_main);
@@ -68,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onMapReady(MapboxMap mapboxMap) {
 
         this.mapboxMap = mapboxMap;
+        mapboxMap.setOnMarkerClickListener(this);
+        mapboxMap.getUiSettings().setScrollGesturesEnabled(false);
+        mapboxMap.setMaxZoomPreference(15);
         enableLocationPlugin();
 
         initRelicLoader();
@@ -82,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
             LocationLayerPlugin locationLayerPlugin = new LocationLayerPlugin(mapView, mapboxMap);
 
             // Set the plugin's camera mode
-            locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
+            locationLayerPlugin.setCameraMode(CameraMode.TRACKING_GPS);
             getLifecycle().addObserver(locationLayerPlugin);
         } else {
             permissionsManager = new PermissionsManager(this);
@@ -100,6 +107,11 @@ public class MainActivity extends AppCompatActivity implements
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
             originLocation = lastLocation;
+            helperLocation = lastLocation;
+
+            if (userLocation == null)
+                userLocation = new Location(lastLocation);
+
         } else {
             locationEngine.addLocationEngineListener(this);
         }
@@ -111,7 +123,10 @@ public class MainActivity extends AppCompatActivity implements
 
         if (networkInfo != null && networkInfo.isConnected()) {
             LoaderManager loaderManager = getLoaderManager();
-            loaderManager.initLoader(RELICS_LOADER_ID, null, this);
+            Bundle loaderBundle = new Bundle();
+            loaderBundle.putDouble("latitude", userLocation.getLatitude());
+            loaderBundle.putDouble("longitude", userLocation.getLongitude());
+            loaderManager.initLoader(RELICS_LOADER_ID, loaderBundle, this);
         } else {
             Log.d(TAG, "No internet connection");
         }
@@ -194,11 +209,23 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
 
+        Log.d(TAG, "Location changed, new coordinates:" + location.getLatitude() + "  " + location.getLongitude());
+
+        if (helperLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
+            helperLocation = location;
+            userLocation = location;
+
+            Bundle loaderBundle = new Bundle();
+            loaderBundle.putDouble("latitude", location.getLatitude());
+            loaderBundle.putDouble("longitude", location.getLongitude());
+            getLoaderManager().restartLoader(1, loaderBundle, this);
+
+        }
     }
 
     @Override
     public Loader<List<Relic>> onCreateLoader(int id, Bundle args) {
-        return new RelicAsyncTaskLoader(this, requestUrl);
+        return new RelicAsyncTaskLoader(this, args);
     }
 
     @Override
@@ -210,5 +237,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<List<Relic>> loader) {
         markerManager.clear();
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+
+        Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
+
+        return false;
     }
 }

@@ -31,10 +31,10 @@ public final class QueryUtils {
         // If we set class as abstract, then we cant make it final
     }
 
-    public static List<Relic> fetchRelicData(String requestUrl) {
+    public static List<Relic> fetchRelicData(String requestUrl, Double latitude, Double longitude, int objectsInMeters) {
 
-        // Create URL object
-        URL url = createUrl(requestUrl);
+        // Create URL object and pass user coordinates in GET method
+        URL url = createUrl(requestUrl, latitude, longitude, objectsInMeters);
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
@@ -88,10 +88,12 @@ public final class QueryUtils {
 
 
     // Returns new URL object from the given string URL.
-    private static URL createUrl(String stringUrl) {
+    private static URL createUrl(String stringUrl, Double latitude, Double longitude, int objectsInMeters) {
         URL url = null;
+
+        String fullUrl = stringUrl + latitude + "/" + longitude + "/" + objectsInMeters;
         try {
-            url = new URL(stringUrl);
+            url = new URL(fullUrl);
         } catch (MalformedURLException e) {
             Log.e(TAG, "Problem building the URL ", e);
         }
