@@ -2,13 +2,14 @@ package com.heroes.hack.travelgo;
 
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,7 +21,6 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -29,8 +29,6 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 
 import java.util.List;
-
-import timber.log.Timber;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         initRelicLoader();
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void enableLocationPlugin() {
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -89,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements
             LocationLayerPlugin locationLayerPlugin = new LocationLayerPlugin(mapView, mapboxMap);
 
             // Set the plugin's camera mode
-            locationLayerPlugin.setCameraMode(CameraMode.TRACKING_GPS);
+            locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
             getLifecycle().addObserver(locationLayerPlugin);
         } else {
             permissionsManager = new PermissionsManager(this);
@@ -97,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void initializeLocationEngine() {
         LocationEngineProvider locationEngineProvider = new LocationEngineProvider(this);
         locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
@@ -152,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     @Override
     protected void onStart() {
         super.onStart();
@@ -219,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements
             loaderBundle.putDouble("latitude", location.getLatitude());
             loaderBundle.putDouble("longitude", location.getLongitude());
             getLoaderManager().restartLoader(1, loaderBundle, this);
-
         }
     }
 
@@ -242,8 +239,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
 
-        Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
+        String snippet[] = marker.getSnippet().split(":");
 
-        return false;
+        Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
+        Intent intent = new Intent(this, RelicMarkerDialog.class);
+        intent.putExtra("marker_title", marker.getTitle());
+        intent.putExtra("marker_dating_object", snippet[0]);
+        intent.putExtra("marker_place_name", snippet[1]);
+        intent.putExtra("marker_latitude", marker.getPosition().getLatitude());
+        intent.putExtra("marker_longitude", marker.getPosition().getLongitude());
+        startActivity(intent);
+
+        return true;
     }
 }
