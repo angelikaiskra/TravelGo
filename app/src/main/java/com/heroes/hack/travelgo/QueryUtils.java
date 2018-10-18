@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -84,6 +85,57 @@ public final class QueryUtils {
         }
 
         return relics;
+    }
+
+    // Make an HTTP request to fetch Token using user's credentials
+    public static String fetchToken(String requestUrl, String authLoginData) {
+        String token = "";
+
+        if(TextUtils.isEmpty(requestUrl) || TextUtils.isEmpty(authLoginData)) {
+            return token;
+        }
+
+        // Create url
+        URL url = createUrl(requestUrl);
+
+        if (url == null) {
+            return token;
+        }
+
+        HttpURLConnection urlConnection = null;
+
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Accept-Encoding", "identity");
+            urlConnection.connect();
+
+            OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
+
+            writer.write(authLoginData);
+            writer.flush();
+            writer.close();
+
+            int statusCode = urlConnection.getResponseCode();
+
+            Log.d(TAG, "Response code when trying to log in is: " + statusCode);
+            if(statusCode == 200) {
+                token = urlConnection.getHeaderField("Authorization");
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "Problem retrieving the token JSON results.", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+        Log.d(TAG, "Token is: " + token);
+        return token;
     }
 
 
