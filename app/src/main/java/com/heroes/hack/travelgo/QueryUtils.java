@@ -74,8 +74,11 @@ public final class QueryUtils {
                 String voivodeshipName = currentRelicObject.getString("voivodeshipName");
                 Double latitude = currentRelicObject.getDouble("latitude");
                 Double longitude = currentRelicObject.getDouble("longitude");
+                //TODO: Fetch real exp
+//                int exp = currentRelicObject.getInt("exp");
+                int exp = 200;
 
-                Relic relic = new Relic(id, identification, datingOfObj, placeName, districtName, voivodeshipName, latitude, longitude);
+                Relic relic = new Relic(id, identification, datingOfObj, placeName, districtName, voivodeshipName, latitude, longitude, exp);
                 relics.add(relic);
             }
 

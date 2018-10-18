@@ -13,6 +13,7 @@ public class RelicMarkerDialog extends Activity {
     private String title;
     private String datingOfObject;
     private String placeName;
+    private int exp;
     private int markerLatitude;
     private int markerLongitude;
 
@@ -28,6 +29,7 @@ public class RelicMarkerDialog extends Activity {
             title = extras.getString("marker_title");
             datingOfObject = extras.getString("marker_dating_object");
             placeName = extras.getString("marker_place_name");
+            exp = extras.getInt("marker_exp");
             markerLatitude = extras.getInt("marker_latitude");
             markerLongitude = extras.getInt("marker_longitude");
         }
@@ -39,17 +41,24 @@ public class RelicMarkerDialog extends Activity {
         TextView titleView = findViewById(R.id.titleView);
         TextView datingView = findViewById(R.id.datingView);
         TextView placeNameView = findViewById(R.id.placeNameView);
+        TextView expViewValue = findViewById(R.id.expValueView);
 
         titleView.setText(title);
-        datingView.setText("Datowanie obiektu: " + datingOfObject);
-        placeNameView.setText("Lokalizacja obiektu: " + placeName);
+        expViewValue.setText(exp + " EXP!");
+
+        datingOfObject = datingOfObject.replaceAll("\\s+","");
+        if (datingOfObject.length() != 0) {
+            datingView.setText(getString(R.string.dating_of_object) + " " + datingOfObject);
+        }
+
+        placeNameView.setText(getString(R.string.place_name) + " " + placeName);
 
         Button buttonVisit = findViewById(R.id.buttonVisit);
         if (buttonVisit.isActivated()) {
             buttonVisit.setEnabled(false);
-            buttonVisit.setText("ODWIEDZONO!");
+            buttonVisit.setText(R.string.visited);
         } else {
-            buttonVisit.setText("ODWIEDŹ MNIE!");
+            buttonVisit.setText(R.string.visit_me);
         }
     }
 }

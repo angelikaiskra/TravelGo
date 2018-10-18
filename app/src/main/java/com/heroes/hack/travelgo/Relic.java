@@ -6,6 +6,7 @@ package com.heroes.hack.travelgo;
 public class Relic {
 
     private int id;
+    private int exp;
     private String identification;
     private String datingOfObj;
     private String placeName;
@@ -15,7 +16,7 @@ public class Relic {
     private Double latitude;
     private Double longitude;
 
-    public Relic(int id, String identification, String datingOfObj, String placeName, String districtName, String voivodeshipName, Double latitude, Double longtitude) {
+    public Relic(int id, String identification, String datingOfObj, String placeName, String districtName, String voivodeshipName, Double latitude, Double longtitude, int exp) {
         this.id = id;
         this.identification = identification;
         this.datingOfObj = datingOfObj;
@@ -24,6 +25,7 @@ public class Relic {
         this.voivodeshipName = voivodeshipName;
         this.latitude = latitude;
         this.longitude = longtitude;
+        this.exp = exp;
     }
 
     public int getId() {
@@ -88,5 +90,13 @@ public class Relic {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
     }
 }

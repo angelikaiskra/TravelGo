@@ -38,10 +38,12 @@ public class MainActivity extends AppCompatActivity implements
         MapboxMap.OnCameraMoveStartedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    public static final int RELICS_LOADER_ID = 1;
-    private static final int DIFFERENCE_DISTANCE_IN_METERS = 500; // load more markers after 1km
-    public String requestUrl;
 
+    public static final int RELICS_LOADER_ID = 1;
+    private static final int DIFFERENCE_DISTANCE_IN_METERS = 100; // load more markers after 1km
+    private static final int MAX_CAMERA_ZOOM = 14; // best - 14
+
+    public String requestUrl;
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationLayerPlugin;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements
     private MapView mapView;
     private Location helperLocation;
     private Location userLocation;
-
     private MarkerManager markerManager;
 
     @Override
@@ -212,8 +213,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
 
-        Log.d(TAG, "Location changed, new coordinates:" + location.getLatitude() + "  " + location.getLongitude());
-
         if (helperLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
             helperLocation = location;
             userLocation = location;
@@ -221,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
             Bundle loaderBundle = new Bundle();
             loaderBundle.putDouble("latitude", location.getLatitude());
             loaderBundle.putDouble("longitude", location.getLongitude());
-            getLoaderManager().restartLoader(1, loaderBundle, this);
+            getLoaderManager().restartLoader(RELICS_LOADER_ID, loaderBundle, this);
         }
     }
 
@@ -251,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra("marker_title", marker.getTitle());
         intent.putExtra("marker_dating_object", snippet[0]);
         intent.putExtra("marker_place_name", snippet[1]);
+        intent.putExtra("marker_exp", Integer.valueOf(snippet[2]));
         intent.putExtra("marker_latitude", marker.getPosition().getLatitude());
         intent.putExtra("marker_longitude", marker.getPosition().getLongitude());
         startActivity(intent);
@@ -261,9 +261,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onCameraMoveStarted(int motionCode) {
 
-        if (mapboxMap.getCameraPosition().zoom <= 14) {
+        if (mapboxMap.getCameraPosition().zoom <= MAX_CAMERA_ZOOM) {
             CameraPosition position = new CameraPosition.Builder()
-                    .zoom(14)
+                    .zoom(MAX_CAMERA_ZOOM)
                     .build();
 
             mapboxMap.animateCamera(CameraUpdateFactory

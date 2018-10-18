@@ -33,7 +33,7 @@ public class MarkerManager {
             relics.addAll(data);
 
             for (int i = 0; i < relics.size(); i++) {
-                String snippet = relics.get(i).getDatingOfObj() + ":" + relics.get(i).getPlaceName();
+                String snippet = relics.get(i).getDatingOfObj() + ":" + relics.get(i).getPlaceName() + ":" + relics.get(i).getExp();
                 mapboxMap.addMarker(createMarker(relics.get(i).getLatitude(), relics.get(i).getLongitude(),
                         relics.get(i).getIdentification(), snippet));
 
