@@ -6,9 +6,9 @@ import android.content.Loader;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,8 +20,9 @@ import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -30,12 +31,10 @@ import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 
 import java.util.List;
 
-import timber.log.Timber;
-
-
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener, LocationEngineListener,
-        LoaderManager.LoaderCallbacks<List<Relic>>, MapboxMap.OnMarkerClickListener {
+        LoaderManager.LoaderCallbacks<List<Relic>>, MapboxMap.OnMarkerClickListener,
+        MapboxMap.OnCameraMoveStartedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final int RELICS_LOADER_ID = 1;
@@ -70,17 +69,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-
         this.mapboxMap = mapboxMap;
         mapboxMap.setOnMarkerClickListener(this);
         mapboxMap.getUiSettings().setScrollGesturesEnabled(false);
-        mapboxMap.setMaxZoomPreference(15);
+        mapboxMap.setOnCameraMoveStartedListener(this);
         enableLocationPlugin();
-
         initRelicLoader();
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void enableLocationPlugin() {
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
             LocationLayerPlugin locationLayerPlugin = new LocationLayerPlugin(mapView, mapboxMap);
 
             // Set the plugin's camera mode
-            locationLayerPlugin.setCameraMode(CameraMode.TRACKING_GPS);
+            locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
             getLifecycle().addObserver(locationLayerPlugin);
         } else {
             permissionsManager = new PermissionsManager(this);
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     private void initializeLocationEngine() {
         LocationEngineProvider locationEngineProvider = new LocationEngineProvider(this);
         locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
@@ -124,9 +121,14 @@ public class MainActivity extends AppCompatActivity implements
         if (networkInfo != null && networkInfo.isConnected()) {
             LoaderManager loaderManager = getLoaderManager();
             Bundle loaderBundle = new Bundle();
-            loaderBundle.putDouble("latitude", userLocation.getLatitude());
-            loaderBundle.putDouble("longitude", userLocation.getLongitude());
-            loaderManager.initLoader(RELICS_LOADER_ID, loaderBundle, this);
+
+            if (userLocation == null) {
+                Toast.makeText(this, "Błąd przy pobieraniu obecnej lokalizacji", Toast.LENGTH_SHORT).show();
+            } else {
+                loaderBundle.putDouble("latitude", userLocation.getLatitude());
+                loaderBundle.putDouble("longitude", userLocation.getLongitude());
+                loaderManager.initLoader(RELICS_LOADER_ID, loaderBundle, this);
+            }
         } else {
             Log.d(TAG, "No internet connection");
         }
@@ -152,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     @Override
     protected void onStart() {
         super.onStart();
@@ -245,5 +247,18 @@ public class MainActivity extends AppCompatActivity implements
         Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
 
         return false;
+    }
+
+    @Override
+    public void onCameraMoveStarted(int motionCode) {
+
+        if (mapboxMap.getCameraPosition().zoom <= 14) {
+            CameraPosition position = new CameraPosition.Builder()
+                    .zoom(14)
+                    .build();
+
+            mapboxMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position));
+        }
     }
 }
