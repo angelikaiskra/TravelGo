@@ -1,12 +1,11 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.async_tasks;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import static com.heroes.hack.travelgo.QueryUtils.fetchToken;
+import static com.heroes.hack.travelgo.utils.QueryUtils.fetchToken;
 
 public class UserLoginAsyncTask extends AsyncTask<String, Void, String> {
     public static final String TAG = UserLoginAsyncTask.class.getSimpleName();

@@ -1,7 +1,9 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.managers;
 
 import android.util.Log;
 
+import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.objects.Relic;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;

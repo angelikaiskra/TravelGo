@@ -1,10 +1,12 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.heroes.hack.travelgo.R;
 
 public class RelicMarkerDialog extends Activity {
 

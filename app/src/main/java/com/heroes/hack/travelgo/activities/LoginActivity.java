@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +19,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.async_tasks.UserLoginAsyncTask;
+import com.heroes.hack.travelgo.utils.EncryptionClass;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.app.LoaderManager;
 import android.content.Context;
@@ -23,6 +23,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.async_tasks.RelicAsyncTaskLoader;
+import com.heroes.hack.travelgo.managers.MarkerManager;
+import com.heroes.hack.travelgo.objects.Relic;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;

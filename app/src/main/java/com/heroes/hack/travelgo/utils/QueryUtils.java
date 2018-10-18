@@ -1,7 +1,9 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.heroes.hack.travelgo.objects.Relic;
 
 import org.json.JSONArray;
 import org.json.JSONException;
