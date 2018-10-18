@@ -18,7 +18,7 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
         super(context);
 
         this.requestUrl = requestUrl;
-        //requestUrl = context.getResources().getString(R.string.request_url);
+//        requestUrl = context.getResources().getString(R.string.request_url);
     }
 
     @Override

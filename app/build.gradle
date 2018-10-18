@@ -32,4 +32,5 @@ dependencies {
 
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.8.2'
+    implementation 'com.android.support:design:27.1.1'
 }
