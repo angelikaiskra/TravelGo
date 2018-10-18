@@ -32,8 +32,8 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp"
-            mapbox:mapbox_cameraZoom="18"
-            mapbox:mapbox_styleUrl="mapbox://styles/angela588/cjn1g0e805oe32srv4h8xmolu" />
+            mapbox:mapbox_styleUrl="mapbox://styles/angela588/cjnetv9sc2uvd2rscy7j4mj31"
+            mapbox:mapbox_cameraZoom="16" />
 
     </RelativeLayout>
 

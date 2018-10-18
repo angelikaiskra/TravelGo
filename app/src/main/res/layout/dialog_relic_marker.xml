@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+        <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/image_relic" />
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nazwa markera"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_below="@id/imageView" />
+
+    <RelativeLayout
+        android:id="@+id/expViews"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/titleView"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/expView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Za ten obiekt możesz zdobyć "
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/expValueView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="200 EXP!"
+                android:textColor="@android:color/holo_orange_dark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_below="@id/expView"  />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/datingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_below="@id/expViews"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"/>
+
+    <TextView
+        android:id="@+id/placeNameView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lokalizacja obiektu: Szczecin"
+        android:textSize="15sp"
+        android:layout_below="@id/datingView"
+        android:layout_marginStart="20dp" />
+
+    <Button
+        android:id="@+id/buttonVisit"
+        android:theme="@style/MyButtonTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ODWIEDŹ MNIE!"
+        android:textSize="18sp"
+        android:layout_below="@id/placeNameView"
+        android:layout_marginTop="15dp"
+        android:layout_centerHorizontal="true"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_below="@id/buttonVisit" />
+
+
+</RelativeLayout>

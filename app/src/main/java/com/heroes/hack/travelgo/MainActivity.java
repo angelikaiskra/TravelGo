@@ -2,27 +2,26 @@ package com.heroes.hack.travelgo;
 
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.ActionBar;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TabHost;
 import android.widget.Toast;
-import android.content.Intent;
-import android.support.v7.widget.Toolbar;
-import android.content.SharedPreferences;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -31,6 +30,10 @@ import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -46,12 +49,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback, PermissionsListener, LocationEngineListener,
-        LoaderManager.LoaderCallbacks<List<Relic>> {
+        LoaderManager.LoaderCallbacks<List<Relic>>, MapboxMap.OnMarkerClickListener,
+        MapboxMap.OnCameraMoveStartedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    public static final int RELICS_LOADER_ID = 1;
-    public static final String requestUrl = "http://192.168.1.8:8080/relics/53.46293098/14.54855329/1200";
 
+    public static final int RELICS_LOADER_ID = 1;
+    private static final int DIFFERENCE_DISTANCE_IN_METERS = 100; // load more markers after 1km
+    private static final int MAX_CAMERA_ZOOM = 13; // best - 13
+
+    public String requestUrl;
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationLayerPlugin;
@@ -60,11 +67,10 @@ public class MainActivity extends AppCompatActivity implements
     private MapView mapView;
     private Toolbar mToolbar;
     private NavigationView navigationView;
-
+    private Location helperLocation;
+    private Location userLocation;
     private MarkerManager markerManager;
-
     private DrawerLayout mDrawerLayout;
-
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
 
@@ -89,7 +95,8 @@ public class MainActivity extends AppCompatActivity implements
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
-        markerManager = new MarkerManager();
+        requestUrl = getResources().getString(R.string.request_url);
+        markerManager = new MarkerManager(IconFactory.getInstance(this));
 
         Mapbox.getInstance(this, getString(R.string.access_token));
 
@@ -135,10 +142,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-
         this.mapboxMap = mapboxMap;
+        mapboxMap.setOnMarkerClickListener(this);
+        mapboxMap.getUiSettings().setScrollGesturesEnabled(false);
+        mapboxMap.setOnCameraMoveStartedListener(this);
         enableLocationPlugin();
-
         initRelicLoader();
     }
 
@@ -169,6 +177,11 @@ public class MainActivity extends AppCompatActivity implements
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
             originLocation = lastLocation;
+            helperLocation = lastLocation;
+
+            if (userLocation == null)
+                userLocation = new Location(lastLocation);
+
         } else {
             locationEngine.addLocationEngineListener(this);
         }
@@ -180,7 +193,15 @@ public class MainActivity extends AppCompatActivity implements
 
         if (networkInfo != null && networkInfo.isConnected()) {
             LoaderManager loaderManager = getLoaderManager();
-            loaderManager.initLoader(RELICS_LOADER_ID, null, this);
+            Bundle loaderBundle = new Bundle();
+
+            if (userLocation == null) {
+                Toast.makeText(this, "Błąd przy pobieraniu obecnej lokalizacji", Toast.LENGTH_SHORT).show();
+            } else {
+                loaderBundle.putDouble("latitude", userLocation.getLatitude());
+                loaderBundle.putDouble("longitude", userLocation.getLongitude());
+                loaderManager.initLoader(RELICS_LOADER_ID, loaderBundle, this);
+            }
         } else {
             Log.d(TAG, "No internet connection");
         }
@@ -263,11 +284,20 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
 
+        if (helperLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
+            helperLocation = location;
+            userLocation = location;
+
+            Bundle loaderBundle = new Bundle();
+            loaderBundle.putDouble("latitude", location.getLatitude());
+            loaderBundle.putDouble("longitude", location.getLongitude());
+            getLoaderManager().restartLoader(RELICS_LOADER_ID, loaderBundle, this);
+        }
     }
 
     @Override
     public Loader<List<Relic>> onCreateLoader(int id, Bundle args) {
-        return new RelicAsyncTaskLoader(this, requestUrl);
+        return new RelicAsyncTaskLoader(this, args);
     }
 
     @Override
@@ -344,4 +374,35 @@ public class MainActivity extends AppCompatActivity implements
 
         return false;
     }
+
+    public boolean onMarkerClick(@NonNull Marker marker) {
+
+        String snippet[] = marker.getSnippet().split(":");
+
+        Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
+        Intent intent = new Intent(this, RelicMarkerDialog.class);
+        intent.putExtra("marker_title", marker.getTitle());
+        intent.putExtra("marker_dating_object", snippet[0]);
+        intent.putExtra("marker_place_name", snippet[1]);
+        intent.putExtra("marker_exp", Integer.valueOf(snippet[2]));
+        intent.putExtra("marker_latitude", marker.getPosition().getLatitude());
+        intent.putExtra("marker_longitude", marker.getPosition().getLongitude());
+        startActivity(intent);
+
+        return true;
+    }
+
+    @Override
+    public void onCameraMoveStarted(int motionCode) {
+
+        if (mapboxMap.getCameraPosition().zoom <= MAX_CAMERA_ZOOM) {
+            CameraPosition position = new CameraPosition.Builder()
+                    .zoom(MAX_CAMERA_ZOOM)
+                    .build();
+
+            mapboxMap.animateCamera(CameraUpdateFactory
+                    .newCameraPosition(position));
+        }
+    }
 }
+

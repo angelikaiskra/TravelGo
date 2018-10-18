@@ -2,6 +2,10 @@ package com.heroes.hack.travelgo;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
+
+import com.heroes.hack.travelgo.R;
 
 import java.util.List;
 
@@ -13,12 +17,18 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
     private static final String TAG = RelicAsyncTaskLoader.class.getSimpleName();
 
     private String requestUrl;
+    private int objectsInMeters;
+    private Double latitude;
+    private Double longitude;
 
-    public RelicAsyncTaskLoader(Context context, String requestUrl) {
+    public RelicAsyncTaskLoader(Context context, Bundle bundle) {
         super(context);
 
-        this.requestUrl = requestUrl;
-//        requestUrl = context.getResources().getString(R.string.request_url);
+        requestUrl = context.getResources().getString(R.string.request_url);
+        objectsInMeters = context.getResources().getInteger(R.integer.objects_in_meters);
+
+        latitude = bundle.getDouble("latitude");
+        longitude = bundle.getDouble("longitude");
     }
 
     @Override
@@ -28,11 +38,12 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
 
     @Override
     public List<Relic> loadInBackground() {
-        if (requestUrl == null) {
+        if (requestUrl == null || latitude == null || longitude == null) {
+            Log.d(TAG, "Detected null url or location during loading async task");
             return null;
         }
 
-        List<Relic> relics = QueryUtils.fetchRelicData(requestUrl);
+        List<Relic> relics = QueryUtils.fetchRelicData(requestUrl, latitude, longitude, objectsInMeters);
         return relics;
     }
 }

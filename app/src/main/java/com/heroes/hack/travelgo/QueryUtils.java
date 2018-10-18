@@ -32,10 +32,10 @@ public final class QueryUtils {
         // If we set class as abstract, then we cant make it final
     }
 
-    public static List<Relic> fetchRelicData(String requestUrl) {
+    public static List<Relic> fetchRelicData(String requestUrl, Double latitude, Double longitude, int objectsInMeters) {
 
-        // Create URL object
-        URL url = createUrl(requestUrl);
+        // Create URL object and pass user coordinates in GET method
+        URL url = createUrl(requestUrl, latitude, longitude, objectsInMeters);
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
@@ -75,8 +75,11 @@ public final class QueryUtils {
                 String voivodeshipName = currentRelicObject.getString("voivodeshipName");
                 Double latitude = currentRelicObject.getDouble("latitude");
                 Double longitude = currentRelicObject.getDouble("longitude");
+                //TODO: Fetch real exp
+//                int exp = currentRelicObject.getInt("exp");
+                int exp = 200;
 
-                Relic relic = new Relic(id, identification, datingOfObj, placeName, districtName, voivodeshipName, latitude, longitude);
+                Relic relic = new Relic(id, identification, datingOfObj, placeName, districtName, voivodeshipName, latitude, longitude, exp);
                 relics.add(relic);
             }
 
@@ -140,6 +143,18 @@ public final class QueryUtils {
 
 
     // Returns new URL object from the given string URL.
+    private static URL createUrl(String stringUrl, Double latitude, Double longitude, int objectsInMeters) {
+        URL url = null;
+
+        String fullUrl = stringUrl + latitude + "/" + longitude + "/" + objectsInMeters;
+        try {
+            url = new URL(fullUrl);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "Problem building the URL ", e);
+        }
+        return url;
+    }
+
     private static URL createUrl(String stringUrl) {
         URL url = null;
         try {
@@ -149,6 +164,7 @@ public final class QueryUtils {
         }
         return url;
     }
+
 
     // Make an HTTP request to the given URL and return a String as the response.
     private static String makeHttpRequest(URL url) throws IOException {

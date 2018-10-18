@@ -5,6 +5,7 @@
       <map>
         <entry key="imageWizard">
           <value>
+<<<<<<< HEAD
             <PersistentState />
           </value>
         </entry>
@@ -14,27 +15,106 @@
               <option name="children">
                 <map>
                   <entry key="vectorAssetStep">
+=======
+            <PersistentState>
+              <option name="children">
+                <map>
+                  <entry key="imageAssetPanel">
+>>>>>>> TG-5
                     <value>
                       <PersistentState>
                         <option name="children">
                           <map>
+<<<<<<< HEAD
                             <entry key="clipartAsset">
+=======
+                            <entry key="actionbar">
+>>>>>>> TG-5
                               <value>
                                 <PersistentState>
                                   <option name="values">
                                     <map>
+<<<<<<< HEAD
                                       <entry key="url" value="jar:file:/Applications/Android%20Studio.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/navigation/ic_first_page_black_24dp.xml" />
+=======
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\angel\Desktop\zabytek2.png" />
+                                      <entry key="outputName" value="image_relic" />
                                     </map>
                                   </option>
                                 </PersistentState>
                               </value>
                             </entry>
+                            <entry key="launcher">
+                              <value>
+                                <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="foregroundImage">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="backgroundAssetType" value="COLOR" />
+                                      <entry key="backgroundColor" value="fbfffd" />
+                                      <entry key="backgroundLayerName" value="ic_relic_background" />
+                                      <entry key="foregroundImage" value="C:\Users\angel\Desktop\zabytek2.png" />
+                                      <entry key="foregroundLayerName" value="ic_relic_foreground" />
+                                      <entry key="legacyIconShape" value="CIRCLE" />
+                                      <entry key="outputName" value="image_relic" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                            <entry key="launcherLegacy">
+                              <value>
+                                <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="trimmed" value="true" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\angel\Desktop\zabytek2.png" />
+                                      <entry key="outputName" value="image_relic" />
+>>>>>>> TG-5
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+<<<<<<< HEAD
                           </map>
                         </option>
                         <option name="values">
                           <map>
                             <entry key="outputName" value="ic_logout" />
                             <entry key="sourceFile" value="$USER_HOME$" />
+=======
+>>>>>>> TG-5
                           </map>
                         </option>
                       </PersistentState>
