@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">TravelGo</string>
+    <string name="access_token">pk.eyJ1IjoiYW5nZWxhNTg4IiwiYSI6ImNqbjFnNDBoYzRqeXkzdm9lZjg2M29ob20ifQ.by2el7eSQhgEt8i5JUIdXg</string>
+    <string name="user_location_permission_explanation">We need permission to access your location in order to app working correctly</string>
+    <string name="user_location_permission_not_granted">Permission not granted! Application can crash</string>
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="prompt_username">Nazwa użytkownika</string>
+    <string name="prompt_password">Hasło</string>
+    <string name="prompt_password_confirm">Potwierdź hasło</string>
+    <string name="action_sign_in">Zarejestruj się</string>
+    <string name="error_invalid_email">Ten email jest nieprawidłowy</string>
+    <string name="error_invalid_password">To hasło jest za krótkie. Wymagane jest 8 znaków.</string>
+    <string name="error_incorrect_password">To hasło jest niepoprawne</string>
+    <string name="error_field_required">To pole jest wymagane</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_login_in">Zaloguj się</string>
+    <string name="register_link_text">Nie mam konta. Chce się zarejestrować</string>
+    <string name="map_item">Mapa</string>
+    <string name="my_profile_item">Mój profil</string>
+    <string name="error_too_short_username">Given username is too short! It must be more than 4 characters</string>
+    <string name="error_password_required">Password field can not be empty</string>
+    <string name="error_password_confirmation_required">Please confirm password</string>
+    <string name="error_password_too_short">Password is to short</string>
+    <string name="error_passwords_not_match">Passwords don\'t match</string>
+    <string name="request_url">http://51.38.134.214:8080/travelgovisit/relic/</string>
+    <string name="user_url">http://51.38.134.214:8080/travelgovisit/user/</string>
+    <string name="request_url_visit">http://51.38.134.214:8080/travelgovisit/user/visit/relic</string>
+    <string name="dating_of_object">Datowanie obiektu:</string>
+    <string name="place_name">Lokalizacja obiektu:</string>
+    <string name="visited">ODWIEDZONO!</string>
+    <string name="visit_me">ODWIEDŹ MNIE!</string>
+    <string name="error_during_localization">Błąd przy pobieraniu obecnej lokalizacji</string>
+    <string name="request_login_url">http://51.38.134.214:8080/travelgovisit/login</string>
+    <string name="log_out_title">Wyloguj się</string>
+    <integer name="objects_in_meters">1500</integer>
 </resources>
