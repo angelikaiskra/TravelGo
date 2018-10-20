@@ -15,12 +15,10 @@ public class UserLoginAsyncTask extends AsyncTask<String, Void, String> {
 
     public UserLoginAsyncTask(Context context) {
         this.mContext = context;
-        Log.d(TAG, "UserLoginAsyncTask initialized");
     }
 
     @Override
     protected String doInBackground(String... params) {
-        Log.d(TAG, "Working in Background");
 
         return fetchToken(params[0], params[1]);
     }
@@ -28,6 +26,5 @@ public class UserLoginAsyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        Log.i(TAG, "POST RESPONSE: " + result);
     }
 }

@@ -8,11 +8,16 @@
             android:id="@+id/my_account"
             android:title="@string/my_profile_item"
             android:icon="@drawable/ic_profile"
-            app:showAsAction="ifRoom"/>
+            app:showAsAction="always"/>
     </group>
     <item
         android:id="@+id/logout_item"
         android:icon="@drawable/ic_logout"
         android:title="@string/log_out_title"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/add_relic_item"
+        android:icon="@drawable/ic_add_relic"
+        android:title="Add new relic"
+        app:showAsAction="always"/>
 </menu>

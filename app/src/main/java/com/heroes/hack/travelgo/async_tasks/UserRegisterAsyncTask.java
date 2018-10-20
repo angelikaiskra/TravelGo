@@ -21,12 +21,10 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
 
     public UserRegisterAsyncTask(Context context) {
         this.mContext = context;
-        Log.d(TAG, "UserRegisterAsyncTask initialized");
     }
 
     @Override
     protected Integer doInBackground(String... params) {
-        Log.d(TAG, "Working in Background");
         HttpURLConnection urlConnection = null;
         URL url = null;
         try {
@@ -38,8 +36,6 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
 
         try {
             settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-
-            Log.d(TAG, params[1]);
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoInput(true);
@@ -53,7 +49,6 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
             writer.flush();
             writer.close();
             int statusCode = urlConnection.getResponseCode();
-            Log.d(TAG, "Response code during registration is: " + statusCode);
             return urlConnection.getResponseCode();
 
         } catch (IOException e) {
@@ -70,7 +65,6 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
     @Override
     protected void onPostExecute(Integer result) {
         super.onPostExecute(result);
-        Log.i(TAG, "REGISTRATION POST RESPONSE: " + result.toString());
     }
 
 }

@@ -400,7 +400,6 @@ public class MainActivity extends AppCompatActivity implements
         String snippet[] = marker.getSnippet().split(":");
         String token = preferences.getString("token", "");
 
-        Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
         Intent intent = new Intent(this, RelicMarkerDialog.class);
 
         intent.putExtra("marker_title", marker.getTitle());

@@ -24,8 +24,6 @@ public class VisitAsyncTask extends AsyncTask<String, Void, Integer> {
     private Integer relicId;
 
     public VisitAsyncTask(String token, String username, Integer relicId) {
-        Log.d(TAG, "VisitDataAsyncTask initialized");
-
         this.token = token;
         this.username = username;
         this.relicId = relicId;
@@ -68,7 +66,6 @@ public class VisitAsyncTask extends AsyncTask<String, Void, Integer> {
             writer.flush();
             writer.close();
             int statusCode = urlConnection.getResponseCode();
-            Log.d(TAG, "Response code during visit request is: " + statusCode);
             return urlConnection.getResponseCode();
 
         } catch (IOException e) {
