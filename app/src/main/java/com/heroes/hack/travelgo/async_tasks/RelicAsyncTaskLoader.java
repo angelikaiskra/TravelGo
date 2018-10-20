@@ -19,6 +19,7 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
     private static final String TAG = RelicAsyncTaskLoader.class.getSimpleName();
 
     private String requestUrl;
+    private String token;
     private int objectsInMeters;
     private Double latitude;
     private Double longitude;
@@ -29,6 +30,7 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
         requestUrl = context.getResources().getString(R.string.request_url);
         objectsInMeters = context.getResources().getInteger(R.integer.objects_in_meters);
 
+        token = bundle.getString("token");
         latitude = bundle.getDouble("latitude");
         longitude = bundle.getDouble("longitude");
     }
@@ -45,7 +47,12 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
             return null;
         }
 
-        List<Relic> relics = QueryUtils.fetchRelicData(requestUrl, latitude, longitude, objectsInMeters);
+        if (token == null) {
+            Log.d(TAG, "Incorrect token");
+            return null;
+        }
+
+        List<Relic> relics = QueryUtils.fetchRelicData(requestUrl, token, latitude, longitude, objectsInMeters);
         return relics;
     }
 }

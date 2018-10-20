@@ -1,11 +1,14 @@
 package com.heroes.hack.travelgo.utils;
 
+import android.util.Base64;
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class EncryptionClass {
+public final class EncryptionClass {
     // Hash algorithm
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
@@ -25,5 +28,16 @@ public class EncryptionClass {
         md.update(textBytes, 0, textBytes.length);
         byte[] sha1hash = md.digest();
         return convertToHex(sha1hash);
+    }
+
+    public static String getDecodedToken(String fullToken) {
+        if (fullToken.length() == 0)
+            return null;
+
+        String[] splitedToken = fullToken.split("\\.", 3);
+        byte[] byteArray = android.util.Base64.decode(splitedToken[1], Base64.DEFAULT);
+        String decodedToken = new String(byteArray);
+
+        return decodedToken;
     }
 }

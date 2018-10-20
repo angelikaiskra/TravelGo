@@ -34,7 +34,7 @@ public final class QueryUtils {
         // If we set class as abstract, then we cant make it final
     }
 
-    public static List<Relic> fetchRelicData(String requestUrl, Double latitude, Double longitude, int objectsInMeters) {
+    public static List<Relic> fetchRelicData(String requestUrl, String token, Double latitude, Double longitude, int objectsInMeters) {
 
         // Create URL object and pass user coordinates in GET method
         URL url = createUrl(requestUrl, latitude, longitude, objectsInMeters);
@@ -42,7 +42,7 @@ public final class QueryUtils {
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
         try {
-            jsonResponse = makeHttpRequest(url);
+            jsonResponse = makeHttpRequest(token, url);
         } catch (IOException e) {
             Log.e(TAG, "Problem making the HTTP request.", e);
         }
@@ -77,9 +77,7 @@ public final class QueryUtils {
                 String voivodeshipName = currentRelicObject.getString("voivodeshipName");
                 Double latitude = currentRelicObject.getDouble("latitude");
                 Double longitude = currentRelicObject.getDouble("longitude");
-                //TODO: Fetch real exp
-//                int exp = currentRelicObject.getInt("exp");
-                int exp = 200;
+                int exp = currentRelicObject.getInt("exp");
 
                 Relic relic = new Relic(id, identification, datingOfObj, placeName, districtName, voivodeshipName, latitude, longitude, exp);
                 relics.add(relic);
@@ -169,7 +167,7 @@ public final class QueryUtils {
 
 
     // Make an HTTP request to the given URL and return a String as the response.
-    private static String makeHttpRequest(URL url) throws IOException {
+    private static String makeHttpRequest(String token, URL url) throws IOException {
         String jsonResponse = "";
 
         // If the URL is null, then return early.
@@ -184,6 +182,7 @@ public final class QueryUtils {
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
+            urlConnection.addRequestProperty("Authorization", "Bearer " + token);
             urlConnection.connect();
 
             // If the request was successful (response code 200),

@@ -27,6 +27,7 @@ import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.async_tasks.RelicAsyncTaskLoader;
 import com.heroes.hack.travelgo.managers.MarkerManager;
 import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.utils.EncryptionClass;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -181,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
             originLocation = lastLocation;
-            helperLocation = lastLocation;
 
             if (userLocation == null)
                 userLocation = new Location(lastLocation);
@@ -198,12 +198,14 @@ public class MainActivity extends AppCompatActivity implements
         if (networkInfo != null && networkInfo.isConnected()) {
             LoaderManager loaderManager = getLoaderManager();
             Bundle loaderBundle = new Bundle();
+            String token = preferences.getString("token", "");
 
             if (userLocation == null) {
-                Toast.makeText(this, "Błąd przy pobieraniu obecnej lokalizacji", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.error_during_localization, Toast.LENGTH_SHORT).show();
             } else {
                 loaderBundle.putDouble("latitude", userLocation.getLatitude());
                 loaderBundle.putDouble("longitude", userLocation.getLongitude());
+                loaderBundle.putString("token", token);
                 loaderManager.initLoader(RELICS_LOADER_ID, loaderBundle, this);
             }
         } else {
@@ -288,13 +290,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLocationChanged(Location location) {
 
-        if (helperLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
-            helperLocation = location;
+        if (userLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
             userLocation = location;
 
             Bundle loaderBundle = new Bundle();
+            String token = preferences.getString("token", "");
+
             loaderBundle.putDouble("latitude", location.getLatitude());
             loaderBundle.putDouble("longitude", location.getLongitude());
+            loaderBundle.putString("token", token);
             getLoaderManager().restartLoader(RELICS_LOADER_ID, loaderBundle, this);
         }
     }
@@ -351,14 +355,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private boolean validateToken(String token) {
-        Log.d(TAG, "validateToken method got token as an argument: " + token);
 
-        if (token.length() == 0) return false;
-
-        String[] splitedToken = token.split("\\.", 3);
-        byte[] byteArray = android.util.Base64.decode(splitedToken[1], Base64.DEFAULT);
-        String decodedToken = new String(byteArray);
-        Log.d(TAG, "Decoded token: " + decodedToken);
+        String decodedToken = EncryptionClass.getDecodedToken(token);
 
         try {
             JSONObject decodedTokenJson = new JSONObject(decodedToken);
@@ -385,10 +383,12 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
         Intent intent = new Intent(this, RelicMarkerDialog.class);
+
         intent.putExtra("marker_title", marker.getTitle());
         intent.putExtra("marker_dating_object", snippet[0]);
         intent.putExtra("marker_place_name", snippet[1]);
         intent.putExtra("marker_exp", Integer.valueOf(snippet[2]));
+        intent.putExtra("relicId", Integer.valueOf(snippet[3]));
         intent.putExtra("marker_latitude", marker.getPosition().getLatitude());
         intent.putExtra("marker_longitude", marker.getPosition().getLongitude());
         startActivity(intent);
@@ -408,5 +408,6 @@ public class MainActivity extends AppCompatActivity implements
                     .newCameraPosition(position));
         }
     }
+
 }
 

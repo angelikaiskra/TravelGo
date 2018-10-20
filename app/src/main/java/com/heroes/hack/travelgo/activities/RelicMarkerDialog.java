@@ -2,6 +2,8 @@ package com.heroes.hack.travelgo.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,12 +14,13 @@ public class RelicMarkerDialog extends Activity {
 
     public static final String TAG = RelicMarkerDialog.class.getSimpleName();
 
+    private int relicId;
     private String title;
     private String datingOfObject;
     private String placeName;
     private int exp;
-    private int markerLatitude;
-    private int markerLongitude;
+    private Double markerLatitude;
+    private Double markerLongitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +31,22 @@ public class RelicMarkerDialog extends Activity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            relicId = extras.getInt("relicId");
             title = extras.getString("marker_title");
             datingOfObject = extras.getString("marker_dating_object");
             placeName = extras.getString("marker_place_name");
             exp = extras.getInt("marker_exp");
-            markerLatitude = extras.getInt("marker_latitude");
-            markerLongitude = extras.getInt("marker_longitude");
+            markerLatitude = extras.getDouble("marker_latitude");
+            markerLongitude = extras.getDouble("marker_longitude");
         }
+
+        Button buttonVisit = findViewById(R.id.buttonVisit);
+        buttonVisit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         setUpLayout();
     }
@@ -54,13 +66,5 @@ public class RelicMarkerDialog extends Activity {
         }
 
         placeNameView.setText(getString(R.string.place_name) + " " + placeName);
-
-        Button buttonVisit = findViewById(R.id.buttonVisit);
-        if (buttonVisit.isActivated()) {
-            buttonVisit.setEnabled(false);
-            buttonVisit.setText(R.string.visited);
-        } else {
-            buttonVisit.setText(R.string.visit_me);
-        }
     }
 }
