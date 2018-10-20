@@ -284,6 +284,8 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.my_account:
                 openUserProfile();
                 return true;
+            case R.id.logout_item:
+                logout();
             default:
                 return super.onOptionsItemSelected(item);
         }
