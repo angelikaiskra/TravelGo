@@ -41,7 +41,6 @@ public class MarkerManager {
                 mapboxMap.addMarker(createMarker(relics.get(i).getLatitude(), relics.get(i).getLongitude(),
                         relics.get(i).getIdentification(), snippet));
 
-                Log.d(TAG, relics.get(i).getIdentification());
             }
 
         } else {

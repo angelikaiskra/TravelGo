@@ -145,8 +145,6 @@ public final class QueryUtils {
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
 
-        Log.d(TAG, "Url in makeHtppRequest is: " + url);
-        Log.d(TAG, "Token in makeHtppRequest is: " + token);
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -155,7 +153,6 @@ public final class QueryUtils {
 
             if (!TextUtils.isEmpty(token)) {
                 urlConnection.addRequestProperty("Authorization", "Bearer " + token);
-                Log.d(TAG, "Auth header: " + urlConnection.getHeaderField("Authorization"));
             }
             urlConnection.connect();
 

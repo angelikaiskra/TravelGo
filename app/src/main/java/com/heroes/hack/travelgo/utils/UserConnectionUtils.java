@@ -29,8 +29,6 @@ public final class UserConnectionUtils {
          *  List of user's relics
          * */
         // Create URL object
-        Log.d(TAG, "URL: " + requestUrl);
-        Log.d(TAG, "Token is: " + token);
         URL url = QueryUtils.createUrl(requestUrl);
 
         String jsonResponse = null;
