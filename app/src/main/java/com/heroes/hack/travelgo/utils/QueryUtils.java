@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.objects.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +44,7 @@ public final class QueryUtils {
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpRequest(token, url);
+
         } catch (IOException e) {
             Log.e(TAG, "Problem making the HTTP request.", e);
         }
@@ -52,6 +54,60 @@ public final class QueryUtils {
 
         return relics;
     }
+
+    public static User fetchUserData(String requestUrl, String token) {
+        /*This method prepares User's data, such as
+        *  User's level
+        *  Points that user has
+        *  Maximum points that user can get on that level
+        * */
+        // Create URL object
+        Log.d(TAG, "URL: " + requestUrl);
+        Log.d(TAG, "Token is: " + token);
+        URL url = createUrl(requestUrl);
+
+        String jsonResponse = null;
+
+        if (TextUtils.isEmpty(token)) {
+            return null;
+        }
+
+        try {
+            jsonResponse = makeHttpRequest(token, url);
+        } catch (IOException e) {
+            Log.e(TAG, "Problem making the HTTP request when trying to fetch User's data.", e);
+        }
+
+        return extractUserDataFromJson(jsonResponse);
+    }
+
+    public static User extractUserDataFromJson(String stringUserData) {
+        if (TextUtils.isEmpty(stringUserData)) {
+            return null;
+        }
+
+        try {
+            JSONObject userDataJSON = new JSONObject(stringUserData);
+            Log.d(TAG, "userDataJSON is: " + userDataJSON);
+            int level = userDataJSON.getInt("level");
+            int experience = userDataJSON.getInt("currentExperience");
+            int leftExperience = userDataJSON.getInt("leftExperience");
+
+            Log.d(TAG, "User Level is: " + level);
+            Log.d(TAG, "User experience is: " + experience);
+            Log.d(TAG, "User leftExperience is: " + leftExperience);
+
+            return new User("", level, experience, leftExperience);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Couldn't get userDataJSON: ", e);
+        }
+
+        return null;
+    }
+
 
     public static List<Relic> extractFeatureFromJson(String relicJSON) {
 
@@ -168,6 +224,7 @@ public final class QueryUtils {
 
     // Make an HTTP request to the given URL and return a String as the response.
     private static String makeHttpRequest(String token, URL url) throws IOException {
+
         String jsonResponse = "";
 
         // If the URL is null, then return early.
@@ -177,12 +234,19 @@ public final class QueryUtils {
 
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
+
+        Log.d(TAG, "Url in makeHtppRequest is: " + url);
+        Log.d(TAG, "Token in makeHtppRequest is: " + token);
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
-            urlConnection.addRequestProperty("Authorization", "Bearer " + token);
+
+            if (!TextUtils.isEmpty(token)) {
+                urlConnection.addRequestProperty("Authorization", "Bearer " + token);
+                Log.d(TAG, "Auth header: " + urlConnection.getHeaderField("Authorization"));
+            }
             urlConnection.connect();
 
             // If the request was successful (response code 200),

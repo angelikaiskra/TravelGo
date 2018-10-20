@@ -1,8 +1,6 @@
 package com.heroes.hack.travelgo.utils;
 
 import android.util.Base64;
-import android.util.Log;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
