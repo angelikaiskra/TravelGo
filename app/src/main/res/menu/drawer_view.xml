@@ -9,11 +9,6 @@
             android:title="@string/my_profile_item"
             android:icon="@drawable/ic_profile"
             app:showAsAction="ifRoom"/>
-        <item
-            android:id="@+id/map"
-            android:icon="@drawable/ic_map"
-            android:title="@string/map_item"
-            app:showAsAction="ifRoom" />
     </group>
     <item
         android:id="@+id/logout_item"

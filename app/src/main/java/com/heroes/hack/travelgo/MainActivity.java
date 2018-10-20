@@ -8,16 +8,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.Toast;
 import android.content.Intent;
@@ -42,6 +41,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -50,7 +50,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final int RELICS_LOADER_ID = 1;
-    public static final String requestUrl = "http://192.168.1.8:8080/relics/53.46293098/14.54855329/1200";
+    public static final String requestUrl = "http://51.38.134.214:8080/relics/53.46293098/14.54855329/1200";
+    public static final String userUrl = "http://51.38.134.214:8080/travelgovisit/user/";
 
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
@@ -59,14 +60,14 @@ public class MainActivity extends AppCompatActivity implements
     private Location originLocation;
     private MapView mapView;
     private Toolbar mToolbar;
-    private NavigationView navigationView;
+    private ProgressBar mProgressBar;
 
     private MarkerManager markerManager;
 
-    private DrawerLayout mDrawerLayout;
-
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
+
+    private UserDataAsyncTask mGetUserDataTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,9 +85,6 @@ public class MainActivity extends AppCompatActivity implements
 
         if (actionBar != null) {
             actionBar.setTitle("Mapa zabytków");
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         }
 
         markerManager = new MarkerManager();
@@ -97,40 +95,26 @@ public class MainActivity extends AppCompatActivity implements
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        String username = preferences.getString("username", "");
+        Log.d(TAG, "Username is: " + username);
+        mGetUserDataTask = new UserDataAsyncTask(getApplicationContext());
+        mGetUserDataTask.execute(userUrl + username, preferences.getString("token", ""));
+        try {
+            User user = mGetUserDataTask.get();
+            if (mGetUserDataTask.get() != null) {
+                user.setUsername(preferences.getString("username", ""));
+                user.saveUsersData(preferences);
+                int percentOfLevelCompletion = (int) preferences.getInt("experience", 1) / preferences.getInt("leftExperience", 100);
+                mProgressBar = findViewById(R.id.progress_bar);
+                mProgressBar.setProgress(percentOfLevelCompletion);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        menuItem.setChecked(true);
 
-                        switch (menuItem.getItemId()) {
-                            case R.id.my_account:
-                                openUserProfile();
-                                break;
-                            case R.id.logout_item:
-                                logout();
-                                break;
-                        }
-
-                        mDrawerLayout.closeDrawer(GravityCompat.START);
-
-                        return true;
-                    }
-                }
-        );
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this,
-                mDrawerLayout,
-                mToolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close
-        );
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
     }
 
     @Override
@@ -284,10 +268,24 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.drawer_view, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.my_account:
+                openUserProfile();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
