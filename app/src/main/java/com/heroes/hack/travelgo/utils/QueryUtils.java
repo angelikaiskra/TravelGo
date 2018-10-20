@@ -1,7 +1,10 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.objects.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.annotation.Target;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;

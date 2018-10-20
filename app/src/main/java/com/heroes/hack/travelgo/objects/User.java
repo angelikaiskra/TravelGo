@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.objects;
 
 import android.content.SharedPreferences;
 

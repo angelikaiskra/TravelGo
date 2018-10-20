@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.app.LoaderManager;
 import android.content.Context;
@@ -17,12 +17,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
-import android.widget.TabHost;
 import android.widget.Toast;
 import android.content.Intent;
 import android.support.v7.widget.Toolbar;
 import android.content.SharedPreferences;
 
+import com.heroes.hack.travelgo.managers.MarkerManager;
+import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.async_tasks.RelicAsyncTaskLoader;
+import com.heroes.hack.travelgo.objects.User;
+import com.heroes.hack.travelgo.async_tasks.UserDataAsyncTask;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;

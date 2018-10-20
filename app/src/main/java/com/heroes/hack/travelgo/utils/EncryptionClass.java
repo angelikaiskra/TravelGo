@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

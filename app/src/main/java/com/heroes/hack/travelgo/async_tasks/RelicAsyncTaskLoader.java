@@ -1,7 +1,10 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.async_tasks;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+
+import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.utils.QueryUtils;
 
 import java.util.List;
 

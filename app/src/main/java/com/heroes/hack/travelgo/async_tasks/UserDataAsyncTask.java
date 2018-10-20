@@ -1,10 +1,12 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.async_tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import static com.heroes.hack.travelgo.QueryUtils.fetchUserData;
+import com.heroes.hack.travelgo.objects.User;
+
+import static com.heroes.hack.travelgo.utils.QueryUtils.fetchUserData;
 
 public class UserDataAsyncTask  extends AsyncTask<String, Void, User> {
     public static final String TAG = UserDataAsyncTask.class.getSimpleName();

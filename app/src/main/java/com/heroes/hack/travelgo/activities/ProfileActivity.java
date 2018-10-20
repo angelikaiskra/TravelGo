@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.heroes.hack.travelgo.R;
 
 public class ProfileActivity extends AppCompatActivity {
 

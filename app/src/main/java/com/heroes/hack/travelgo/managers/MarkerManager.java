@@ -1,11 +1,8 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.managers;
 
-import android.app.LoaderManager;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.heroes.hack.travelgo.objects.Relic;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

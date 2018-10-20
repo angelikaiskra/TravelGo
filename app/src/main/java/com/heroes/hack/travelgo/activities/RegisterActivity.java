@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -27,6 +27,10 @@ import org.json.JSONObject;
 
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
+
+import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.async_tasks.UserRegisterAsyncTask;
+import com.heroes.hack.travelgo.utils.EncryptionClass;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;

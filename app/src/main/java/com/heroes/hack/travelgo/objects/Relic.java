@@ -1,4 +1,4 @@
-package com.heroes.hack.travelgo;
+package com.heroes.hack.travelgo.objects;
 
 /**
  * Created by Angelika Iskra on 12.10.2018.
