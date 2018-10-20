@@ -86,6 +86,7 @@
             <Button
                 android:id="@+id/login_button"
                 style="?android:textAppearanceSmall"
+                android:theme="@style/MyButtonTheme"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
                 android:layout_height="wrap_content"

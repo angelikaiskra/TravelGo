@@ -1,9 +1,14 @@
 package com.heroes.hack.travelgo.utils;
 
 import android.util.Base64;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 
 public final class EncryptionClass {
@@ -20,12 +25,35 @@ public final class EncryptionClass {
         }
         return buf.toString();
     }
+
     public static String SHA1(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] textBytes = text.getBytes("iso-8859-1");
         md.update(textBytes, 0, textBytes.length);
         byte[] sha1hash = md.digest();
         return convertToHex(sha1hash);
+    }
+
+
+    public static boolean validateToken(String token) {
+
+        String decodedToken = getDecodedToken(token);
+
+        try {
+            JSONObject decodedTokenJson = new JSONObject(decodedToken);
+            long currentDate = new Date().getTime();
+            long expirationDate = Long.parseLong(decodedTokenJson.get("exp").toString().concat("000"));
+
+            if (expirationDate > currentDate) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public static String getDecodedToken(String fullToken) {

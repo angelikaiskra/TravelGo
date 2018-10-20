@@ -1,10 +1,10 @@
 package com.heroes.hack.travelgo.async_tasks;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -12,21 +12,37 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
+/**
+ * Created by Angelika Iskra on 20.10.2018.
+ */
+public class VisitAsyncTask extends AsyncTask<String, Void, Integer> {
 
-    public static final String TAG = UserRegisterAsyncTask.class.getSimpleName();
-    private Context mContext;
+    private static final String TAG = VisitAsyncTask.class.getSimpleName();
 
-    private SharedPreferences settings;
+    private String token;
+    private String username;
+    private Integer relicId;
 
-    public UserRegisterAsyncTask(Context context) {
-        this.mContext = context;
-        Log.d(TAG, "UserRegisterAsyncTask initialized");
+    public VisitAsyncTask(String token, String username, Integer relicId) {
+        Log.d(TAG, "VisitDataAsyncTask initialized");
+
+        this.token = token;
+        this.username = username;
+        this.relicId = relicId;
     }
 
     @Override
     protected Integer doInBackground(String... params) {
-        Log.d(TAG, "Working in Background");
+        if (params[0] == null || username == null || relicId == null) { // params[0] = requestUrl
+            Log.d(TAG, "Detected null url or username during loading async task");
+            return null;
+        }
+
+        if (token == null) {
+            Log.d(TAG, "Incorrect token");
+            return null;
+        }
+
         HttpURLConnection urlConnection = null;
         URL url = null;
         try {
@@ -37,23 +53,22 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
         }
 
         try {
-            settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-
-            Log.d(TAG, params[1]);
-
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
+            urlConnection.setRequestMethod("PUT");
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
+            urlConnection.setRequestProperty("Authorization", "Bearer " + token);
 
             OutputStreamWriter writer = new OutputStreamWriter(urlConnection.getOutputStream());
 
-            writer.write(params[1]);
+            String requestBody = createJson().toString();
+            writer.write(requestBody);
             writer.flush();
             writer.close();
             int statusCode = urlConnection.getResponseCode();
-            Log.d(TAG, "Response code during registration is: " + statusCode);
+            Log.d(TAG, "Response code during visit request is: " + statusCode);
             return urlConnection.getResponseCode();
 
         } catch (IOException e) {
@@ -64,13 +79,24 @@ public class UserRegisterAsyncTask extends AsyncTask<String, Void, Integer> {
                 urlConnection.disconnect();
             }
         }
-
     }
 
     @Override
     protected void onPostExecute(Integer result) {
         super.onPostExecute(result);
-        Log.i(TAG, "REGISTRATION POST RESPONSE: " + result.toString());
+        Log.i(TAG, "Received UserData: " + result);
     }
 
+    private JSONObject createJson() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("username", username);
+            json.put("relicId", relicId);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return json;
+    }
 }

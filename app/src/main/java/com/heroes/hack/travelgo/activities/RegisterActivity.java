@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,16 +21,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 
 import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.async_tasks.UserRegisterAsyncTask;
 import com.heroes.hack.travelgo.utils.EncryptionClass;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public static final String TAG = RegisterActivity.class.getSimpleName();
     private static final String requestUrl = "http://51.38.134.214:8080/travelgovisit/user/register";
-
+    View focusView;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -55,12 +53,8 @@ public class RegisterActivity extends AppCompatActivity {
     private View mLoginFormView;
     private Button mSignInButton;
     private Toolbar toolbar;
-
     private JSONObject authDataJson;
-
     private UserRegisterAsyncTask mAuthTask;
-
-    View focusView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +68,6 @@ public class RegisterActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setTitle("Zarejestruj się");
         }
-
 
         // Set up the register form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);

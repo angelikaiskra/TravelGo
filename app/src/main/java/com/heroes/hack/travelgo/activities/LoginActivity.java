@@ -34,7 +34,8 @@ import java.security.NoSuchAlgorithmException;
 public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = RegisterActivity.class.getSimpleName();
-    private static final String requestUrl = "http://51.38.134.214:8080/travelgovisit/login";
+
+    private String requestUrl;
 
     // UI references.
     private Toolbar mToolbar;
@@ -54,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        requestUrl = getString(R.string.request_login_url);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -112,11 +114,11 @@ public class LoginActivity extends AppCompatActivity {
         boolean cancel = false;
         mFocusView = null;
 
-        if(TextUtils.isEmpty(username)) {
+        if (TextUtils.isEmpty(username)) {
             mUsernameView.setError("Musisz podać nazwę użytkownika!");
             cancel = true;
         }
-        if(TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(password)) {
             mPasswordView.setError("Musisz podać hasło!");
             cancel = true;
         }

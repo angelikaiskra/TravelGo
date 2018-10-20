@@ -4,29 +4,48 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.objects.User;
+import com.heroes.hack.travelgo.utils.UserConnectionUtils;
 
-import static com.heroes.hack.travelgo.utils.QueryUtils.fetchUserData;
-
-public class UserDataAsyncTask  extends AsyncTask<String, Void, User> {
+public class UserDataAsyncTask extends AsyncTask<String, Void, User> {
     public static final String TAG = UserDataAsyncTask.class.getSimpleName();
-    public Context mContext;
 
-    public UserDataAsyncTask(Context context) {
-        this.mContext = context;
-        Log.d(TAG, "UserDataAsyncTask initialized");
-    }
-    @Override
-    protected User doInBackground(String ... params) {
-        Log.d(TAG, "Working in Background");
-        Log.d(TAG, "URL: " + params[0]);
-        Log.d(TAG, "Token is: " + params[1]);
-        return fetchUserData(params[0], params[1]);
+    private User user;
+    private String requestUrl;
+    private String token;
+    private String username;
+
+    public UserDataAsyncTask(Context context, String token, String username) {
+
+        requestUrl = context.getResources().getString(R.string.user_url);
+        this.token = token;
+        this.username = username;
+        user = new User(username);
     }
 
     @Override
-    protected void onPostExecute(User result) {
-        super.onPostExecute(result);
-        Log.i(TAG, "UserData: " + result);
+    protected User doInBackground(String... params) {
+
+        if (requestUrl == null || username == null) {
+            Log.d(TAG, "Detected null url or username during executing async task");
+            return null;
+        }
+
+        if (token == null) {
+            Log.d(TAG, "Incorrect token");
+            return null;
+        }
+
+        String fullUrl = requestUrl + username;
+
+        User receivedUser = UserConnectionUtils.fetchUserData(fullUrl, token);
+        return receivedUser;
+    }
+
+    @Override
+    protected void onPostExecute(User user) {
+        super.onPostExecute(user);
+        Log.d(TAG, "Received User Data: " + user.toString());
     }
 }

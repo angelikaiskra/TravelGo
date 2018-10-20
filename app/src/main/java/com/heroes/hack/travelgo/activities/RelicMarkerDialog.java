@@ -1,14 +1,18 @@
 package com.heroes.hack.travelgo.activities;
 
 import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.heroes.hack.travelgo.R;
+import com.heroes.hack.travelgo.async_tasks.VisitAsyncTask;
 
 public class RelicMarkerDialog extends Activity {
 
@@ -19,8 +23,11 @@ public class RelicMarkerDialog extends Activity {
     private String datingOfObject;
     private String placeName;
     private int exp;
-    private Double markerLatitude;
-    private Double markerLongitude;
+    private String token;
+    private String requestUrl;
+    private String username;
+
+    private VisitAsyncTask asyncTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,17 +43,14 @@ public class RelicMarkerDialog extends Activity {
             datingOfObject = extras.getString("marker_dating_object");
             placeName = extras.getString("marker_place_name");
             exp = extras.getInt("marker_exp");
-            markerLatitude = extras.getDouble("marker_latitude");
-            markerLongitude = extras.getDouble("marker_longitude");
+            token = extras.getString("token");
+            username = extras.getString("username");
         }
 
-        Button buttonVisit = findViewById(R.id.buttonVisit);
-        buttonVisit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        requestUrl = getResources().getString(R.string.request_url_visit);
 
-            }
-        });
+        Button buttonVisit = findViewById(R.id.buttonVisit);
+        buttonVisit.setOnClickListener(v -> visitButtonClicked());
 
         setUpLayout();
     }
@@ -60,11 +64,47 @@ public class RelicMarkerDialog extends Activity {
         titleView.setText(title);
         expViewValue.setText(exp + " EXP!");
 
-        datingOfObject = datingOfObject.replaceAll("\\s+","");
+        datingOfObject = datingOfObject.replaceAll("\\s+", "");
         if (datingOfObject.length() != 0) {
             datingView.setText(getString(R.string.dating_of_object) + " " + datingOfObject);
         }
 
         placeNameView.setText(getString(R.string.place_name) + " " + placeName);
     }
+
+    private void visitButtonClicked() {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            //Register async task to send request to user
+            asyncTask = new VisitAsyncTask(token, username, relicId);
+            asyncTask.execute(requestUrl);
+            try {
+                if (asyncTask.get() == 200) {
+                    Toast.makeText(this, "Odwiedzono obiekt: " + relicId, Toast.LENGTH_SHORT).show();
+                    finish();
+
+                } else if (asyncTask.get() == 406) {
+                    Toast.makeText(this, "Ten obiekt został już odwiedzony: " + relicId, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(this, "Błąd połączenia", Toast.LENGTH_SHORT).show();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            Log.d(TAG, "No internet connection");
+        }
+
+    }
 }
+

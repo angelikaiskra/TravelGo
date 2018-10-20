@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.objects.Relic;
-import com.heroes.hack.travelgo.utils.QueryUtils;
+import com.heroes.hack.travelgo.utils.RelicConnectionUtils;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class RelicAsyncTaskLoader extends AsyncTaskLoader<List<Relic>> {
             return null;
         }
 
-        List<Relic> relics = QueryUtils.fetchRelicData(requestUrl, token, latitude, longitude, objectsInMeters);
+        List<Relic> relics = RelicConnectionUtils.fetchRelicData(requestUrl, token, latitude, longitude, objectsInMeters);
         return relics;
     }
 }

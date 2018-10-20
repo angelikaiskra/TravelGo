@@ -11,27 +11,25 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.async_tasks.RelicAsyncTaskLoader;
+import com.heroes.hack.travelgo.async_tasks.UserDataAsyncTask;
 import com.heroes.hack.travelgo.managers.MarkerManager;
 import com.heroes.hack.travelgo.objects.Relic;
-import com.heroes.hack.travelgo.utils.EncryptionClass;
 import com.heroes.hack.travelgo.objects.User;
-import com.heroes.hack.travelgo.async_tasks.UserDataAsyncTask;
+import com.heroes.hack.travelgo.utils.EncryptionClass;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.android.core.location.LocationEnginePriority;
@@ -49,11 +47,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 
@@ -67,21 +63,17 @@ public class MainActivity extends AppCompatActivity implements
     public static final int RELICS_LOADER_ID = 1;
     private static final int DIFFERENCE_DISTANCE_IN_METERS = 100; // load more markers after 1km
     private static final int MAX_CAMERA_ZOOM = 13; // best - 13
-    public static final String userUrl = "http://51.38.134.214:8080/travelgovisit/user/";
 
+    public String userUrl;
     public String requestUrl;
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
     private LocationLayerPlugin locationLayerPlugin;
     private LocationEngine locationEngine;
-    private Location originLocation;
     private MapView mapView;
     private Toolbar mToolbar;
-    private NavigationView navigationView;
-    private Location helperLocation;
     private Location userLocation;
     private MarkerManager markerManager;
-    private DrawerLayout mDrawerLayout;
     private ProgressBar mProgressBar;
     private SharedPreferences preferences;
     private SharedPreferences.Editor editor;
@@ -103,10 +95,19 @@ public class MainActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle("Mapa zabytków");
+            actionBar.setTitle("Travel Go");
         }
 
-        requestUrl = getResources().getString(R.string.request_url);
+        ImageView profilePictureView = findViewById(R.id.user_profile_picture);
+        profilePictureView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openUserProfile();
+            }
+        });
+
+        requestUrl = getString(R.string.request_url);
+        userUrl = getString(R.string.user_url);
         markerManager = new MarkerManager(IconFactory.getInstance(this));
 
         Mapbox.getInstance(this, getString(R.string.access_token));
@@ -115,26 +116,7 @@ public class MainActivity extends AppCompatActivity implements
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        String username = preferences.getString("username", "");
-        Log.d(TAG, "Username is: " + username);
-        mGetUserDataTask = new UserDataAsyncTask(getApplicationContext());
-        mGetUserDataTask.execute(userUrl + username, preferences.getString("token", ""));
-        try {
-            User user = mGetUserDataTask.get();
-            if (mGetUserDataTask.get() != null) {
-                user.setUsername(preferences.getString("username", ""));
-                user.saveUsersData(preferences);
-                int percentOfLevelCompletion = (int) preferences.getInt("experience", 1) / preferences.getInt("leftExperience", 100);
-                mProgressBar = findViewById(R.id.progress_bar);
-                mProgressBar.setProgress(percentOfLevelCompletion);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-
+        initUserDataLoader();
     }
 
     @Override
@@ -173,14 +155,43 @@ public class MainActivity extends AppCompatActivity implements
 
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
-            originLocation = lastLocation;
-
-            if (userLocation == null)
-                userLocation = new Location(lastLocation);
+            userLocation = new Location(lastLocation);
 
         } else {
             locationEngine.addLocationEngineListener(this);
         }
+    }
+
+    private void initUserDataLoader() {
+
+        String token = preferences.getString("token", "");
+        String username = preferences.getString("username", "");
+
+        mGetUserDataTask = new UserDataAsyncTask(this, token, username);
+        mGetUserDataTask.execute(userUrl + username, preferences.getString("token", ""));
+        try {
+            User user = mGetUserDataTask.get();
+            if (mGetUserDataTask.get() != null) {
+                saveUserData(user);
+                int percentOfLevelCompletion = (int) preferences.getInt("experience", 1) / preferences.getInt("leftExperience", 100);
+                mProgressBar = findViewById(R.id.progress_bar);
+                mProgressBar.setProgress(percentOfLevelCompletion);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveUserData(User user) {
+        editor = preferences.edit();
+        editor.putString("username", user.getUsername());
+        editor.putInt("level", user.getLevel());
+        editor.putInt("experience", user.getExperience());
+        editor.putInt("leftExperience", user.getLeftExperience());
+        editor.putStringSet("relicsList", user.getRelicsIdSet());
+        editor.apply();
     }
 
     private void initRelicLoader() {
@@ -225,11 +236,26 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.drawer_view, menu);
+        return true;
+    }
+
     @SuppressWarnings({"MissingPermission"})
     @Override
     protected void onStart() {
         super.onStart();
         mapView.onStart();
+        if (locationEngine != null) {
+            locationEngine.addLocationEngineListener(this);
+            if (locationEngine.isConnected()) {
+                locationEngine.requestLocationUpdates();
+            } else {
+                locationEngine.activate();
+            }
+        }
         if (locationLayerPlugin != null) {
             locationLayerPlugin.onStart();
         }
@@ -251,8 +277,12 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         mapView.onStop();
+        if (locationEngine != null) {
+            locationEngine.removeLocationEngineListener(this);
+            locationEngine.removeLocationUpdates();
+        }
         if (locationLayerPlugin != null) {
-            locationLayerPlugin.onStart();
+            locationLayerPlugin.onStop();
         }
     }
 
@@ -266,6 +296,9 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        if (locationEngine != null) {
+            locationEngine.deactivate();
+        }
     }
 
     @Override
@@ -274,9 +307,10 @@ public class MainActivity extends AppCompatActivity implements
         mapView.onLowMemory();
     }
 
+    @SuppressWarnings({"MissingPermission"})
     @Override
     public void onConnected() {
-
+        locationEngine.requestLocationUpdates();
     }
 
     @Override
@@ -312,18 +346,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.drawer_view, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
@@ -338,7 +360,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void openUserProfile() {
+
         Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra("username", preferences.getString("username", ""));
+        intent.putExtra("token", preferences.getString("token", ""));
+        intent.putExtra("level", preferences.getInt("level", 0));
+        intent.putExtra("experience", preferences.getInt("experience", 0));
+        intent.putExtra("leftExperience", preferences.getInt("leftExperience", 0));
+
+        Set<String> relicsIdSet = preferences.getStringSet("relicsList", null);
+        ArrayList<String> arrayList = new ArrayList<>(relicsIdSet);
+        intent.putStringArrayListExtra("relicsList", arrayList);
+
         startActivity(intent);
     }
 
@@ -356,38 +389,16 @@ public class MainActivity extends AppCompatActivity implements
     private void isLoggedIn() {
         String token = preferences.getString("token", "");
 
-        if (!validateToken(token)) {
+        if (!EncryptionClass.validateToken(token)) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
     }
 
-    private boolean validateToken(String token) {
-
-        String decodedToken = EncryptionClass.getDecodedToken(token);
-
-        try {
-            JSONObject decodedTokenJson = new JSONObject(decodedToken);
-            long currentDate = new Date().getTime();
-            long expirationDate = Long.parseLong(decodedTokenJson.get("exp").toString().concat("000"));
-
-            Log.d(TAG, "CurrentTime: " + currentDate);
-            Log.d(TAG, "Expiration token time: " + expirationDate);
-            if (expirationDate > currentDate) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
     public boolean onMarkerClick(@NonNull Marker marker) {
 
         String snippet[] = marker.getSnippet().split(":");
+        String token = preferences.getString("token", "");
 
         Log.d("MainActivity", "Marker Clicked!" + marker.getTitle());
         Intent intent = new Intent(this, RelicMarkerDialog.class);
@@ -397,8 +408,8 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra("marker_place_name", snippet[1]);
         intent.putExtra("marker_exp", Integer.valueOf(snippet[2]));
         intent.putExtra("relicId", Integer.valueOf(snippet[3]));
-        intent.putExtra("marker_latitude", marker.getPosition().getLatitude());
-        intent.putExtra("marker_longitude", marker.getPosition().getLongitude());
+        intent.putExtra("token", token);
+        intent.putExtra("username", preferences.getString("username", ""));
         startActivity(intent);
 
         return true;

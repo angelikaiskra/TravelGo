@@ -37,10 +37,10 @@
                 tools:ignore="RtlHardcoded">
                 <ImageView
                     android:id="@+id/user_profile_picture"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="15dp"
-                    android:src="@mipmap/ic_launcher_round"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_marginTop="25dp"
+                    android:src="@mipmap/ic_avatar_round"
                     android:layout_gravity="center"/>
                 <ProgressBar
                     android:id="@+id/progress_bar"
@@ -48,9 +48,7 @@
                     android:layout_width="80dp"
                     android:layout_height="10dp"
                     android:layout_gravity="bottom"
-                    android:layout_marginTop="10dp"
-                    android:progress="25"
-                    />
+                    android:layout_marginTop="10dp" />
             </LinearLayout>
         </com.mapbox.mapboxsdk.maps.MapView>
 

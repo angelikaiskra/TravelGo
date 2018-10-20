@@ -19,7 +19,7 @@ public class UserLoginAsyncTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String ... params) {
+    protected String doInBackground(String... params) {
         Log.d(TAG, "Working in Background");
 
         return fetchToken(params[0], params[1]);

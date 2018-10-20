@@ -26,11 +26,14 @@
     <string name="error_password_too_short">Password is to short</string>
     <string name="error_passwords_not_match">Passwords don\'t match</string>
     <string name="request_url">http://51.38.134.214:8080/travelgovisit/relic/</string>
+    <string name="user_url">http://51.38.134.214:8080/travelgovisit/user/</string>
     <string name="request_url_visit">http://51.38.134.214:8080/travelgovisit/user/visit/relic</string>
     <string name="dating_of_object">Datowanie obiektu:</string>
     <string name="place_name">Lokalizacja obiektu:</string>
     <string name="visited">ODWIEDZONO!</string>
     <string name="visit_me">ODWIEDŹ MNIE!</string>
     <string name="error_during_localization">Błąd przy pobieraniu obecnej lokalizacji</string>
+    <string name="request_login_url">http://51.38.134.214:8080/travelgovisit/login</string>
+    <string name="log_out_title">Wyloguj się</string>
     <integer name="objects_in_meters">1500</integer>
 </resources>
