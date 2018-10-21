@@ -2,6 +2,7 @@ package com.heroes.hack.travelgo.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.heroes.hack.travelgo.async_tasks.VisitAsyncTask;
 public class RelicMarkerDialog extends Activity {
 
     public static final String TAG = RelicMarkerDialog.class.getSimpleName();
+    public static final int MAX_DISTANCE_TO_MARKER = 100;
 
     private int relicId;
     private String title;
@@ -27,7 +29,13 @@ public class RelicMarkerDialog extends Activity {
     private String requestUrl;
     private String username;
 
+    private Double userLatitude;
+    private Double userLongitude;
+    private Double markerLatitude;
+    private Double markerLongitude;
+
     private VisitAsyncTask asyncTask;
+    private Button buttonVisit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +53,20 @@ public class RelicMarkerDialog extends Activity {
             exp = extras.getInt("marker_exp");
             token = extras.getString("token");
             username = extras.getString("username");
+
+            userLatitude = extras.getDouble("userLatitude");
+            userLongitude = extras.getDouble("userLongitude");
+            markerLatitude = extras.getDouble("markerLatitude");
+            markerLongitude = extras.getDouble("markerLongitude");
         }
 
         requestUrl = getResources().getString(R.string.request_url_visit);
 
-        Button buttonVisit = findViewById(R.id.buttonVisit);
+        buttonVisit = findViewById(R.id.buttonVisit);
         buttonVisit.setOnClickListener(v -> visitButtonClicked());
 
         setUpLayout();
+        checkIfButtonCanBeClicked();
     }
 
     private void setUpLayout() {
@@ -70,6 +84,26 @@ public class RelicMarkerDialog extends Activity {
         }
 
         placeNameView.setText(getString(R.string.place_name) + " " + placeName);
+    }
+
+    private void checkIfButtonCanBeClicked() {
+
+        Location userLocation = new Location("");
+        userLocation.setLatitude(userLatitude);
+        userLocation.setLongitude(userLongitude);
+
+        Location markerLocation = new Location("");
+        markerLocation.setLatitude(markerLatitude);
+        markerLocation.setLongitude(markerLongitude);
+
+        if (userLocation.distanceTo(markerLocation) > MAX_DISTANCE_TO_MARKER) {
+            Toast.makeText(this, "Jesteś za daleko od obiektu", Toast.LENGTH_LONG).show();
+            buttonVisit.setEnabled(false);
+            buttonVisit.setAlpha(.5f);
+
+        } else {
+            buttonVisit.setEnabled(true);
+        }
     }
 
     private void visitButtonClicked() {
@@ -104,7 +138,6 @@ public class RelicMarkerDialog extends Activity {
         } else {
             Log.d(TAG, "No internet connection");
         }
-
     }
 }
 

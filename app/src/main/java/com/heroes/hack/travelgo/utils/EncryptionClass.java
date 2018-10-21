@@ -49,7 +49,7 @@ public final class EncryptionClass {
             } else {
                 return false;
             }
-        } catch (JSONException e) {
+        } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -57,6 +57,11 @@ public final class EncryptionClass {
     }
 
     public static String getDecodedToken(String fullToken) {
+
+        if (fullToken == null) {
+            return null;
+        }
+
         if (fullToken.length() == 0)
             return null;
 

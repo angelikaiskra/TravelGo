@@ -80,19 +80,19 @@
                 android:text="@string/register_link_text"
                 android:layout_gravity="center_horizontal"
                 android:textColor="@color/colorPrimary"
-                android:textSize="12sp"
-                />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/login_button"
                 style="?android:textAppearanceSmall"
-                android:theme="@style/MyButtonTheme"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_login_in"
-                android:textStyle="bold" />
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:theme="@style/MyButtonTheme" />
 
         </LinearLayout>
     </ScrollView>

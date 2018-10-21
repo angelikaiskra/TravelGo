@@ -37,6 +37,10 @@ public class UserDataAsyncTask extends AsyncTask<String, Void, User> {
             return null;
         }
 
+        if (token.isEmpty()) {
+            return null;
+        }
+
         String fullUrl = requestUrl + username;
 
         User receivedUser = UserConnectionUtils.fetchUserData(fullUrl, token);
@@ -46,6 +50,5 @@ public class UserDataAsyncTask extends AsyncTask<String, Void, User> {
     @Override
     protected void onPostExecute(User user) {
         super.onPostExecute(user);
-        Log.d(TAG, "Received User Data: " + user.toString());
     }
 }

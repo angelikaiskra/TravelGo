@@ -23,9 +23,16 @@ public class GetUserRelicTaskLoader extends AsyncTaskLoader<List<Relic>> {
 
     public GetUserRelicTaskLoader(Context context, Bundle bundle) {
         super(context);
-        requestUrl = getContext().getResources().getString(R.string.user_url);
+
         username = bundle.getString("username");
         token = bundle.getString("token");
+
+        if (bundle.getString("requestUrl") == null || bundle.getString("requestUrl").isEmpty()) {
+            requestUrl = getContext().getResources().getString(R.string.user_url);
+            requestUrl += username + "/relics";
+        } else {
+            requestUrl = bundle.getString("requestUrl");
+        }
     }
 
     @Override
@@ -39,9 +46,7 @@ public class GetUserRelicTaskLoader extends AsyncTaskLoader<List<Relic>> {
             return null;
         }
 
-        String fullUrl = requestUrl + username + "/relics";
-
-        List<Relic> relics = RelicConnectionUtils.fetchUserRelicData(fullUrl, token);
+        List<Relic> relics = RelicConnectionUtils.fetchUserRelicData(requestUrl, token);
         return relics;
     }
 
