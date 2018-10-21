@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final String TAG = MainActivity.class.getSimpleName();
 
     public static final int RELICS_LOADER_ID = 1;
-    private static final int DIFFERENCE_DISTANCE_IN_METERS = 100; // load more markers after 1km
+    private static final int DIFFERENCE_DISTANCE_IN_METERS = 200; // load more markers after 200m
     private static final int MAX_CAMERA_ZOOM = 13; // best - 13
 
     public String userUrl;
@@ -125,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements
         mapboxMap.setOnMarkerClickListener(this);
         mapboxMap.getUiSettings().setScrollGesturesEnabled(false);
         mapboxMap.setOnCameraMoveStartedListener(this);
+
         enableLocationPlugin();
-        initRelicLoader();
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -135,11 +135,14 @@ public class MainActivity extends AppCompatActivity implements
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             initializeLocationEngine();
 
-            LocationLayerPlugin locationLayerPlugin = new LocationLayerPlugin(mapView, mapboxMap);
+            LocationLayerPlugin locationLayerPlugin = new LocationLayerPlugin(mapView, mapboxMap, locationEngine);
+            locationLayerPlugin.setLocationLayerEnabled(true);
 
             // Set the plugin's camera mode
             locationLayerPlugin.setCameraMode(CameraMode.TRACKING);
             getLifecycle().addObserver(locationLayerPlugin);
+
+            initRelicLoader();
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(this);
@@ -148,10 +151,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @SuppressWarnings({"MissingPermission"})
     private void initializeLocationEngine() {
-        LocationEngineProvider locationEngineProvider = new LocationEngineProvider(this);
-        locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
+        locationEngine = new LocationEngineProvider(this).obtainBestLocationEngineAvailable();
+        locationEngine.setInterval(1000);
+        locationEngine.setFastestInterval(500);
+        locationEngine.addLocationEngineListener(this);
         locationEngine.setPriority(LocationEnginePriority.HIGH_ACCURACY);
         locationEngine.activate();
+        locationEngine.requestLocationUpdates();
 
         Location lastLocation = locationEngine.getLastLocation();
         if (lastLocation != null) {
@@ -173,9 +179,11 @@ public class MainActivity extends AppCompatActivity implements
             User user = mGetUserDataTask.get();
             if (mGetUserDataTask.get() != null) {
                 saveUserData(user);
-                int percentOfLevelCompletion = (int) preferences.getInt("experience", 1) / preferences.getInt("leftExperience", 100);
+                double experience = preferences.getInt("experience", 1);
+                double leftExperience = preferences.getInt("leftExperience", 100);
+                double percentOfLevelCompletion = experience / leftExperience * 100;
                 mProgressBar = findViewById(R.id.progress_bar);
-                mProgressBar.setProgress(percentOfLevelCompletion);
+                mProgressBar.setProgress((int) percentOfLevelCompletion);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -319,6 +327,8 @@ public class MainActivity extends AppCompatActivity implements
         if (userLocation.distanceTo(location) >= DIFFERENCE_DISTANCE_IN_METERS) {
             userLocation = location;
 
+            Log.d("MainActivity", "Location changed, loading new markers");
+
             Bundle loaderBundle = new Bundle();
             String token = preferences.getString("token", "");
 
@@ -354,13 +364,15 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.logout_item:
                 logout();
+            case R.id.add_relic_item:
+                openAddRelic();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     public void openUserProfile() {
-
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra("username", preferences.getString("username", ""));
         intent.putExtra("token", preferences.getString("token", ""));
@@ -386,6 +398,16 @@ public class MainActivity extends AppCompatActivity implements
         finish();
     }
 
+    public void openAddRelic() {
+        Intent intent = new Intent(this, AddRelicActivity.class);
+        intent.putExtra("username", preferences.getString("username", ""));
+        intent.putExtra("token", preferences.getString("token", ""));
+        intent.putExtra("level", preferences.getInt("level", 0));
+        intent.putExtra("latitude", userLocation.getLatitude());
+        intent.putExtra("longitude", userLocation.getLongitude());
+        startActivity(intent);
+    }
+
     private void isLoggedIn() {
         String token = preferences.getString("token", "");
 
@@ -398,17 +420,19 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onMarkerClick(@NonNull Marker marker) {
 
         String snippet[] = marker.getSnippet().split(":");
-        String token = preferences.getString("token", "");
 
         Intent intent = new Intent(this, RelicMarkerDialog.class);
-
         intent.putExtra("marker_title", marker.getTitle());
         intent.putExtra("marker_dating_object", snippet[0]);
         intent.putExtra("marker_place_name", snippet[1]);
         intent.putExtra("marker_exp", Integer.valueOf(snippet[2]));
         intent.putExtra("relicId", Integer.valueOf(snippet[3]));
-        intent.putExtra("token", token);
+        intent.putExtra("token", preferences.getString("token", ""));
         intent.putExtra("username", preferences.getString("username", ""));
+        intent.putExtra("userLatitude", userLocation.getLatitude());
+        intent.putExtra("userLongitude", userLocation.getLongitude());
+        intent.putExtra("markerLatitude", marker.getPosition().getLatitude());
+        intent.putExtra("markerLongitude", marker.getPosition().getLongitude());
         startActivity(intent);
 
         return true;

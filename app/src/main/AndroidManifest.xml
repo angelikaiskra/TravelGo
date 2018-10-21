@@ -26,14 +26,15 @@
         <activity android:name=".activities.ProfileActivity" />
         <activity
             android:name=".activities.RegisterActivity"
-            android:label="@string/title_activity_login"></activity>
+            android:label="@string/title_activity_login" />
         <activity
             android:name=".activities.LoginActivity"
-            android:label="Login in"></activity>
+            android:label="Login in" />
         <activity
             android:name=".activities.RelicMarkerDialog"
             android:label=""
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity android:name=".activities.AddRelicActivity"></activity>
     </application>
 
 </manifest>
