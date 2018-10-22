@@ -39,7 +39,7 @@ import java.security.NoSuchAlgorithmException;
 public class RegisterActivity extends AppCompatActivity {
 
     public static final String TAG = RegisterActivity.class.getSimpleName();
-    private static final String requestUrl = "http://51.38.134.214:8080/travelgovisit/user/register";
+    private String requestUrl;
     View focusView;
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -60,6 +60,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        requestUrl = getResources().getString(R.string.request_url_register);
 
         // Set default app bar
         toolbar = (Toolbar) findViewById(R.id.toolbar);

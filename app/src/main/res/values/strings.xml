@@ -39,4 +39,5 @@
     <string name="request_url">http://51.38.134.214:8080/travelgo/relic/</string>
     <string name="user_url">http://51.38.134.214:8080/travelgo/user/</string>
     <string name="request_url_visit">http://51.38.134.214:8080/travelgo/user/visit/relic</string>
+    <string name="request_url_register">http://51.38.134.214:8080/travelgo/user/register</string>
 </resources>
