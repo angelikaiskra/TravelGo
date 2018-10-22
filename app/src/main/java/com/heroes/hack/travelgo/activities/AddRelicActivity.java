@@ -41,6 +41,8 @@ public class AddRelicActivity extends AppCompatActivity implements LoaderManager
     private RelicAdapter mAdapter;
     private TextView noDataText;
 
+    private Toolbar mToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +61,7 @@ public class AddRelicActivity extends AppCompatActivity implements LoaderManager
 
         noDataText = findViewById(R.id.no_data_text);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.add_relic_toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();

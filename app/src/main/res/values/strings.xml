@@ -33,10 +33,10 @@
     <string name="log_out_title">Wyloguj się</string>
     <integer name="objects_in_meters">1500</integer>
 
-    <string name="add_relic_url">http://51.38.134.214:8080/travelgovisit/add/custom</string>
-    <string name="delete_relic_url">http://51.38.134.214:8080/travelgovisit/delete/custom</string>
-    <string name="request_login_url">http://51.38.134.214:8080/travelgovisit/login</string>
-    <string name="request_url">http://51.38.134.214:8080/travelgovisit/relic/</string>
-    <string name="user_url">http://51.38.134.214:8080/travelgovisit/user/</string>
-    <string name="request_url_visit">http://51.38.134.214:8080/travelgovisit/user/visit/relic</string>
+    <string name="add_relic_url">http://51.38.134.214:8080/travelgo/add/custom</string>
+    <string name="delete_relic_url">http://51.38.134.214:8080/travelgo/delete/custom</string>
+    <string name="request_login_url">http://51.38.134.214:8080/travelgo/login</string>
+    <string name="request_url">http://51.38.134.214:8080/travelgo/relic/</string>
+    <string name="user_url">http://51.38.134.214:8080/travelgo/user/</string>
+    <string name="request_url_visit">http://51.38.134.214:8080/travelgo/user/visit/relic</string>
 </resources>
