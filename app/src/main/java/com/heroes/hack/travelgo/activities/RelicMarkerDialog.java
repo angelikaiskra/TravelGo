@@ -2,10 +2,13 @@ package com.heroes.hack.travelgo.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
@@ -14,6 +17,15 @@ import android.widget.Toast;
 
 import com.heroes.hack.travelgo.R;
 import com.heroes.hack.travelgo.async_tasks.VisitAsyncTask;
+import com.heroes.hack.travelgo.objects.Relic;
+import com.heroes.hack.travelgo.objects.User;
+import com.heroes.hack.travelgo.utils.QueryUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+
+import java.util.List;
 
 public class RelicMarkerDialog extends Activity {
 
@@ -37,12 +49,18 @@ public class RelicMarkerDialog extends Activity {
     private VisitAsyncTask asyncTask;
     private Button buttonVisit;
 
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_relic_marker);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -117,16 +135,30 @@ public class RelicMarkerDialog extends Activity {
         if (networkInfo != null && networkInfo.isConnected()) {
 
             //Register async task to send request to user
+            // It should returns user data
             asyncTask = new VisitAsyncTask(token, username, relicId);
             asyncTask.execute(requestUrl);
             try {
-                if (asyncTask.get() == 200) {
-                    Toast.makeText(this, "Odwiedzono obiekt: " + relicId, Toast.LENGTH_SHORT).show();
-                    finish();
-
-                } else if (asyncTask.get() == 406) {
+                JSONObject updatedDataResponse = asyncTask.get();
+                if (!TextUtils.isEmpty(updatedDataResponse.getString("error"))) {
                     Toast.makeText(this, "Ten obiekt został już odwiedzony: " + relicId, Toast.LENGTH_SHORT).show();
                     finish();
+
+                } else if (!TextUtils.isEmpty(updatedDataResponse.getString("username"))) {
+                    Toast.makeText(this, "Odwiedzono obiekt: " + relicId, Toast.LENGTH_SHORT).show();
+
+                    JSONArray relicsJSONArray = updatedDataResponse.getJSONArray("relics");
+                    String username = updatedDataResponse.getString("username");
+                    int level = updatedDataResponse.getInt("level");
+                    int experience = updatedDataResponse.getInt("currentExperience");
+                    int leftExperience = updatedDataResponse.getInt("leftExperience");
+
+                    List<Relic> userRelics = QueryUtils.extractRelicsFromJson(relicsJSONArray.toString());
+
+                    User updatedUser = new User(username, level, experience, leftExperience, userRelics);
+                    saveUserData(updatedUser);
+                    finish();
+
                 } else {
                     Toast.makeText(this, "Błąd połączenia", Toast.LENGTH_SHORT).show();
                 }
@@ -138,6 +170,16 @@ public class RelicMarkerDialog extends Activity {
         } else {
             Log.d(TAG, "No internet connection");
         }
+    }
+
+    private void saveUserData(User user) {
+        editor = preferences.edit();
+        editor.putString("username", user.getUsername());
+        editor.putInt("level", user.getLevel());
+        editor.putInt("experience", user.getExperience());
+        editor.putInt("leftExperience", user.getLeftExperience());
+        editor.putStringSet("relicsList", user.getRelicsIdSet());
+        editor.apply();
     }
 }
 
