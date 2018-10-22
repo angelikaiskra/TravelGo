@@ -174,22 +174,26 @@ public class MainActivity extends AppCompatActivity implements
         String username = preferences.getString("username", "");
 
         mGetUserDataTask = new UserDataAsyncTask(this, token, username);
-        mGetUserDataTask.execute(userUrl + username, preferences.getString("token", ""));
+        mGetUserDataTask.execute(userUrl + username, token);
         try {
             User user = mGetUserDataTask.get();
-            if (mGetUserDataTask.get() != null) {
+            if (user != null) {
                 saveUserData(user);
-                double experience = preferences.getInt("experience", 1);
-                double leftExperience = preferences.getInt("leftExperience", 100);
-                double percentOfLevelCompletion = experience / leftExperience * 100;
-                mProgressBar = findViewById(R.id.progress_bar);
-                mProgressBar.setProgress((int) percentOfLevelCompletion);
+                updateProgressBar();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateProgressBar() {
+        double experience = preferences.getInt("experience", 1);
+        double leftExperience = preferences.getInt("leftExperience", 100);
+        double percentOfLevelCompletion = experience / leftExperience * 100;
+        mProgressBar = findViewById(R.id.progress_bar);
+        mProgressBar.setProgress((int) percentOfLevelCompletion);
     }
 
     private void saveUserData(User user) {
@@ -267,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements
         if (locationLayerPlugin != null) {
             locationLayerPlugin.onStart();
         }
+        updateProgressBar();
+
     }
 
     @Override
