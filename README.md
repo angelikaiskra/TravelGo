@@ -6,10 +6,10 @@ Application efficiently combines AR (augmented reality) with elements of gamific
 
 ## Screenshots
 
-![1](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/1.png)
-![2](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/2.png)
-![3](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/3.png)
-![4](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/4.png)
+![1](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/1.png =250x250) 
+![2](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/2.png =250x250) 
+![3](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/3.png =250x250) 
+![4](https://raw.githubusercontent.com/angelikaiskra/TravelGo/master/images/4.png =250x250) 
 
 ## Authors
 
